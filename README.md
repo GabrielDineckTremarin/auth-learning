@@ -8,6 +8,6 @@ Welcome to the Authentication Learning Project! This repository is dedicated to 
 The main goal of this project is to:
 
 - **Learn**: Understand the fundamental concepts of authentication.
-- **Practice**: Implement hands-on exercises and projects to reinforce learning.
+- **Practice**: Implement an authentication system to reinforce learning.
 
 
