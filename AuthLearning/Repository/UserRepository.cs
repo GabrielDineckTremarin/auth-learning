@@ -30,13 +30,14 @@ namespace AuthLearning.Repository
 
         public DtoUser GetUser(string email)
         {
-            var filter = Builders<DtoUser>.Filter.Eq("Email", ObjectId.Parse(email));
+            var filter = Builders<DtoUser>.Filter.Eq("Email", email);
             var user = _userCollection.Find(filter).FirstOrDefault();
             return user;
         }
 
         public void UpdateUser(DtoUser user)
         {
+   
             var filter = Builders<DtoUser>.Filter.Eq("Email", user.Email);
             var update = Builders<DtoUser>.Update
                 .Set(x => x.Username, user.Username)
@@ -44,6 +45,7 @@ namespace AuthLearning.Repository
                 .Set(x => x.Password, user.Password);
 
             _userCollection.UpdateOne(filter, update);
+
         }
 
         public void DeleteUser(string email)

@@ -24,5 +24,12 @@ namespace AuthLearning.Controllers
         {
             return await _blUser.CreateUser(user);
         }
+
+        [HttpPost]
+        [Route("teste")]
+        public async Task<object> teste()
+        {
+            return await _blUser.teste();
+        }
     }
 }

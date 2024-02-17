@@ -1,5 +1,7 @@
 ﻿using AuthLearning.Models;
 using AuthLearning.Service;
+using MongoDB.Bson;
+using MongoDB.Bson.Serialization.Attributes;
 
 namespace AuthLearning.Business
 {
@@ -16,6 +18,29 @@ namespace AuthLearning.Business
             try
             {
                 _userService.CreateUser(user);
+                return new { Message = "User created", Success = true };
+            }
+            catch (Exception ex)
+            {
+                return new { Message = ex.Message, Success = false };
+
+            }
+        }
+
+        public async Task<object> teste()
+        {
+            try
+            {
+                var user = new DtoUser()
+                {
+                    Email = "teste@gmail.com",
+                    Password = "password123",
+                    Username = "TesteUser",
+
+                };
+                _userService.CreateUser(user);
+
+                var createdUser = _userService.GetUser(email: user.Email.ToString());
                 return new { Message = "User created", Success = true };
             }
             catch (Exception ex)
