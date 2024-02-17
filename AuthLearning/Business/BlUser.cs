@@ -1,7 +1,7 @@
 ﻿using AuthLearning.Models;
 using AuthLearning.Service;
-using MongoDB.Bson;
-using MongoDB.Bson.Serialization.Attributes;
+using System.Text.RegularExpressions;
+using AuthLearning.Utils;
 
 namespace AuthLearning.Business
 {
@@ -13,34 +13,23 @@ namespace AuthLearning.Business
             _userService = userService;
         }
 
-        public async Task<object> CreateUser(DtoUser user)
+        public async Task<object> CreateUser(NewUser newUser)
         {
             try
             {
-                _userService.CreateUser(user);
-                return new { Message = "User created", Success = true };
-            }
-            catch (Exception ex)
-            {
-                return new { Message = ex.Message, Success = false };
+                var validation = await ValidateUser(newUser);
+                if(!string.IsNullOrEmpty(validation))throw new Exception(validation);
 
-            }
-        }
-
-        public async Task<object> teste()
-        {
-            try
-            {
                 var user = new DtoUser()
                 {
-                    Email = "teste@gmail.com",
-                    Password = "password123",
-                    Username = "TesteUser",
+                    Email = newUser.Email,
+                    Password = StringUtils.GetHashString(newUser.Password),
+                    Username = newUser.Username,
+                };      
 
-                };
                 _userService.CreateUser(user);
 
-                var createdUser = _userService.GetUser(email: user.Email.ToString());
+
                 return new { Message = "User created", Success = true };
             }
             catch (Exception ex)
@@ -49,6 +38,76 @@ namespace AuthLearning.Business
 
             }
         }
+        public async Task<string> ValidateUser(NewUser user)
+        {
+            if (user == null)
+                return "Please, fill out the form correctly";
+
+            if (String.IsNullOrEmpty(user.Email))
+                return "You need to enter a valid email";
+
+            string emailPattern = @"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$";
+            Regex regexEmail = new Regex(emailPattern);
+            if(!regexEmail.IsMatch(user.Email))
+                return "You need to enter a valid email";
+
+            var existingUser = _userService.GetUser(user.Email);
+            if(existingUser != null)
+                return "This email is registered already";
+
+            if(String.IsNullOrEmpty(user.Username))
+                return "You need to enter a valid username";
+
+            var count = 0;
+            foreach(var ch in user.Username)
+            {
+                count++;
+            }
+
+            if(count < 10)
+                return "Your username must have at least 10 characters";
+
+            if (count > 20)
+                return "Your username must have at most 20 characters";
+
+            if (String.IsNullOrEmpty(user.Password))
+                return "You need to enter a valid password";
+
+            if (String.IsNullOrEmpty(user.ConfirmPassword))
+                return "You need to confirm your password";
+
+            string regexPattern = "[@; ]";
+            Regex regexUsername = new Regex(regexPattern);
+            if(regexUsername.IsMatch(user.Username))
+                return "Your username can not contain characters such as ';', '@' and blank spaces";
+
+
+            count = 0;
+            foreach(var ch in user.Password)
+            {
+                count++;
+            }
+
+            if (count < 10)
+                return "Your password must have at least 10 characters";
+
+            if (count > 20)
+                return "Your password must have at most 20 characters";
+
+            //string passPattern = @"^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@_])[A-Za-z\d@_]+$";
+            string passPattern = @"^(?=.*[a-zA-Z])(?=.*\d).+";
+            Regex regexPass = new Regex(passPattern);
+            if(!regexPass.IsMatch(user.Password))
+                return "Your password must have at least one special characters such as '@' or '_', one uppercase letter, one lowercase letter and one number";
+
+            if (user.ConfirmPassword != user.Password)
+                return "The passwords do not match";
+
+            return String.Empty;
+
+        }
+
+
     }
 
 

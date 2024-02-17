@@ -20,16 +20,10 @@ namespace AuthLearning.Controllers
 
         [HttpPost]
         [Route("create-user")]
-        public async Task<object> CreateUser([FromBody] DtoUser user)
+        public async Task<object> CreateUser([FromBody] NewUser user)
         {
             return await _blUser.CreateUser(user);
         }
 
-        [HttpPost]
-        [Route("teste")]
-        public async Task<object> teste()
-        {
-            return await _blUser.teste();
-        }
     }
 }
