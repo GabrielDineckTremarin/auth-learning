@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("AuthLearning")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+d9e44144e58d3c6371323a67e00feddbb5415a27")]
 [assembly: System.Reflection.AssemblyProductAttribute("AuthLearning")]
 [assembly: System.Reflection.AssemblyTitleAttribute("AuthLearning")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

@@ -10,6 +10,7 @@ using System.Text;
 
 namespace AuthLearning.Controllers
 {
+    [Authorize(AuthenticationSchemes = "Bearer")]
     [ApiController]
     [Route("[controller]")]
     public class UserController : ControllerBase
@@ -20,32 +21,18 @@ namespace AuthLearning.Controllers
         public UserController(IUserService userService, IConfiguration configuration)
         {
             _userService = userService;
-            _blUser = new BlUser(userService);
+            _blUser = new BlUser(userService, configuration);
             _configuration = configuration;
         }
 
         [HttpPost]
         [Route("create-user")]
+        [AllowAnonymous]
         public async Task<object> CreateUser([FromBody] NewUser user)
         {
             return await _blUser.CreateUser(user);
         }
 
-        [HttpGet]
-        [Route("test-unauthorized")]
-        [AllowAnonymous]
-        public async Task<object> TestUnauthorized() 
-        {
-            return new { Message = "Hello World Unauthorized", Success = true };
-        }
-
-        [HttpGet]
-        [Route("test-authorized")]
-        [Authorize]
-        public async Task<object> TestAuthorized()
-        {
-            return new { Message = "Hello World Authorized", Success = true };
-        }
 
         [HttpPost]
         [Route("check-login")]
@@ -54,28 +41,8 @@ namespace AuthLearning.Controllers
         {
             try
             {
-                if (user.Email == "gabriel@gmail.com" && user.Password == "gab123")
-                {
-
-                    var claims = new[]
-                    {
-                    //new Claim(JwtRegisteredClaimNames.Sub, _configuration["Jwt:Subject"]),
-                    new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
-                    new Claim(JwtRegisteredClaimNames.Iat, DateTime.UtcNow.ToString()),
-                    new Claim("Email", user.Email),
-                    };
-
-                    var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["Jwt:Key"]));
-                    var signIn = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
-                    var token = new JwtSecurityToken(
-                         claims: claims,
-                        expires: DateTime.UtcNow.AddMinutes(10),
-                        signingCredentials: signIn);
-
-                    var tokenString = new JwtSecurityTokenHandler().WriteToken(token);
-
-                    return new { Message = "Authorized", Success = true, Token = tokenString };
-                }
+                var result = await _blUser.Login(user);
+                return result;            
             }
             catch(Exception ex)
             {

@@ -80,13 +80,14 @@ async function checkLogin() {
         body: JSON.stringify(userData)
     });
         const responseData = await response.json();
-        console.log(responseData)
         if (responseData.success) {
-            console.log(responseData.token)
             successMsg.innerHTML = responseData.message
             localStorage.setItem('token', responseData.token);
+
             setTimeout(()=> {
                 successMsg.innerHTML = ''
+                console.log("merda")
+                location.href = "Logout.html"
             },3000)
 
    

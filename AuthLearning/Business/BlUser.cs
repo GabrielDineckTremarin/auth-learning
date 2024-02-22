@@ -1,7 +1,6 @@
 ﻿using AuthLearning.Models;
 using AuthLearning.Service;
 using System.Text.RegularExpressions;
-using AuthLearning.Utils;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
@@ -151,7 +150,6 @@ namespace AuthLearning.Business
                     return new { Message = "Authorized", Success = true, Token = tokenString };
 
                 } 
-
 
                 return new { Message = "Unauthorized", Success = false };
             }
