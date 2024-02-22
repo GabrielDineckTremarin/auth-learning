@@ -15,7 +15,7 @@ namespace AuthLearning.Controllers
     public class UserController : ControllerBase
     {
         private readonly IUserService _userService;
-        IConfiguration _configuration;
+        private readonly IConfiguration _configuration;
         private readonly BlUser _blUser;
         public UserController(IUserService userService, IConfiguration configuration)
         {

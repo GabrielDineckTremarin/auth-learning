@@ -2,15 +2,22 @@
 using AuthLearning.Service;
 using System.Text.RegularExpressions;
 using AuthLearning.Utils;
+using Microsoft.IdentityModel.Tokens;
+using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
+using System.Text;
 
 namespace AuthLearning.Business
 {
     public class BlUser
     {
         private readonly IUserService _userService;
-        public BlUser(IUserService userService)
+        private readonly IConfiguration _configuration;
+
+        public BlUser(IUserService userService, IConfiguration configuration)
         {
             _userService = userService;
+            _configuration = configuration;
         }
 
         public async Task<object> CreateUser(NewUser newUser)
@@ -20,13 +27,14 @@ namespace AuthLearning.Business
                 var validation = await ValidateUser(newUser);
                 if(!string.IsNullOrEmpty(validation))throw new Exception(validation);
 
+                string hashedPassword = BCrypt.Net.BCrypt.HashPassword(newUser.Password, BCrypt.Net.BCrypt.GenerateSalt(12));
+
                 var user = new DtoUser()
                 {
                     Email = newUser.Email,
-                    Password = StringUtils.GetHashString(newUser.Password),
+                    Password = hashedPassword,
                     Username = newUser.Username,
-                };      
-
+                };
                 _userService.CreateUser(user);
 
 
@@ -105,6 +113,53 @@ namespace AuthLearning.Business
 
             return String.Empty;
 
+        }
+
+
+        public async Task<object> Login(DtoUser user)
+        {
+            try
+            {
+                if (user == null) throw new Exception("Invalid user!");
+
+                if(String.IsNullOrEmpty(user.Email) || String.IsNullOrEmpty(user.Password))
+                    throw new Exception("You need to fill out the email and password fields!");
+
+                var dbUser = _userService.GetUser(user.Email);
+
+                if (dbUser == null) throw new Exception("There is not any user with this email!");
+
+                if(dbUser.Email == user.Email && BCrypt.Net.BCrypt.Verify(user.Password, dbUser.Password))
+                {
+                    var claims = new[]
+                    {
+                    //new Claim(JwtRegisteredClaimNames.Sub, _configuration["Jwt:Subject"]),
+                    new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
+                    new Claim(JwtRegisteredClaimNames.Iat, DateTime.UtcNow.ToString()),
+                    new Claim("Email", user.Email),
+                    };
+
+                    var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["Jwt:Key"]));
+                    var signIn = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
+                    var token = new JwtSecurityToken(
+                        claims: claims,
+                        expires: DateTime.UtcNow.AddMinutes(10),
+                        signingCredentials: signIn);
+
+                    var tokenString = new JwtSecurityTokenHandler().WriteToken(token);
+
+                    return new { Message = "Authorized", Success = true, Token = tokenString };
+
+                } 
+
+
+                return new { Message = "Unauthorized", Success = false };
+            }
+            catch (Exception ex)
+            {
+                return new { Message = ex.Message, Success = false };
+
+            }
         }
 
 

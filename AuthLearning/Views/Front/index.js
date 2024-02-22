@@ -35,24 +35,23 @@ async function createUser() {
     });
         const responseData = await response.json();
         if (responseData.success) {
-            // successMsg.innerHTML = responseData.message
+            successMsg.innerHTML = responseData.message
             setTimeout(()=> {
                 successMsg.innerHTML = ''
-                // location.reload()
+                location.reload()
                 location.href = "Login.html"
             },3000)
             
         } else {
-            // msgContainer.style.display = 'block'
-            // errorMsg.innerHTML = responseData.message
+            msgContainer.style.display = 'block'
+            errorMsg.innerHTML = responseData.message
             setTimeout(()=> {
-                // errorMsg.innerHTML = ''
+                errorMsg.innerHTML = ''
             },4000)
 
         }
 
-        
-        console.log(responseData); // Handle the response data
+        console.log(responseData); 
     } catch (error) {
         console.error('Fetch error:', error);
     }
@@ -84,17 +83,21 @@ async function checkLogin() {
         console.log(responseData)
         if (responseData.success) {
             console.log(responseData.token)
-            // successMsg.innerHTML = responseData.message
+            successMsg.innerHTML = responseData.message
             localStorage.setItem('token', responseData.token);
+            setTimeout(()=> {
+                successMsg.innerHTML = ''
+            },3000)
 
    
         } else {
-            // msgContainer.style.display = 'block'
-            // errorMsg.innerHTML = responseData.message
+            msgContainer.style.display = 'block'
+            errorMsg.innerHTML = responseData.message
+            setTimeout(()=> {
+                errorMsg.innerHTML = ''
+            },4000)
         }
 
-        
-        console.log(responseData); // Handle the response data
     } catch (error) {
         console.error('Fetch error:', error);
     }

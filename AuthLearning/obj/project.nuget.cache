@@ -1,11 +1,12 @@
 {
   "version": 2,
-  "dgSpecHash": "RfNCgloGxMzYgffsHbpvOXYDbo0d10AEVkMwKoMUu0kuZ6s+Ryfse9xXxfSvHe+h/Np4Adx7QwdJJlDlMJ7edQ==",
+  "dgSpecHash": "MCsI50e2v29MDjtBT4/SKfJW24SoiM/bXb3WqqY7CLVyiyl9zpH82ThF8z519atw/IlJdbuoGkrrJ2LXV0hAcg==",
   "success": true,
   "projectFilePath": "C:\\Users\\princ\\Documents\\Repositorios\\auth-learning\\AuthLearning\\AuthLearning.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\princ\\.nuget\\packages\\awssdk.core\\3.7.100.14\\awssdk.core.3.7.100.14.nupkg.sha512",
     "C:\\Users\\princ\\.nuget\\packages\\awssdk.securitytoken\\3.7.100.14\\awssdk.securitytoken.3.7.100.14.nupkg.sha512",
+    "C:\\Users\\princ\\.nuget\\packages\\bcrypt.net-core\\1.6.0\\bcrypt.net-core.1.6.0.nupkg.sha512",
     "C:\\Users\\princ\\.nuget\\packages\\dnsclient\\1.6.1\\dnsclient.1.6.1.nupkg.sha512",
     "C:\\Users\\princ\\.nuget\\packages\\microsoft.aspnetcore.authentication.jwtbearer\\7.0.0\\microsoft.aspnetcore.authentication.jwtbearer.7.0.0.nupkg.sha512",
     "C:\\Users\\princ\\.nuget\\packages\\microsoft.csharp\\4.5.0\\microsoft.csharp.4.5.0.nupkg.sha512",
