@@ -1,6 +1,6 @@
 # Authentication Learning Project
 
-Welcome to the Authentication Learning Project! This repository is dedicated to my learning about implementing a JWT authentication system.
+Welcome to the Authentication Learning Project! This repository is dedicated to my learning about implementing a JWT (Json Web Token) authentication system.
 
 
 ## Purpose
