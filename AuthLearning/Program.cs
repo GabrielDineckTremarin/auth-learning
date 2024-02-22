@@ -1,5 +1,9 @@
 using AuthLearning.Repository;
 using AuthLearning.Service;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.DataProtection.KeyManagement;
+using Microsoft.IdentityModel.Tokens;
+using System.Text;
 
 
 var builder = WebApplication.CreateBuilder(args);
@@ -9,6 +13,22 @@ builder.Services.AddControllersWithViews();
 
 builder.Services.AddSingleton<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IUserService, UserService>();
+
+builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJwtBearer(options =>
+    {
+        options.RequireHttpsMetadata = false;
+        options.SaveToken = true;
+
+        options.TokenValidationParameters = new TokenValidationParameters()
+        {
+          
+            ValidateIssuer = false,
+            ValidateAudience = false,
+            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"]))
+
+
+        };
+    });
 
 builder.Services.AddCors(options =>
 {

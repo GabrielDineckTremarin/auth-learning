@@ -12,7 +12,7 @@
     <h1 class="mt-5 text-center">Log In</h1>
 
     <main class="d-flex justify-content-center align-items-center " >
-        <form class="col-12 col-sm-6 col-lg-4">
+        <form id="form" class="col-12 col-sm-6 col-lg-4">
             <div class="form-group mt-3">
                 <label for="email">Email:</label>
                 <input type="text" class="form-control" id="email" placeholder="Enter your email">
@@ -21,15 +21,19 @@
 
             <div class="form-group mt-3">
                 <label for="password">Password:</label>
-                <input type="password" class="form-control" id="email"  placeholder="Enter your password">
+                <input type="password" class="form-control" id="password"  placeholder="Enter your password">
             </div>
-            <button type="submit" class="btn btn-primary mt-2 ml-auto d-block m-auto">Log In</button>
+            <button onclick="checkLogin()" type="submit" class="btn btn-primary mt-2 ml-auto d-block m-auto">Log In</button>
         </form>
     </main>
     <p class="text-center mt-5">If you don't have an account, <a href="Signin.html">click here</a> to sign in</p>
+    <div class="message-container mt-5">
+        <p style="font-size: 20px" class="error-message text-danger bold fw-bolder text-center"></p>
+        <p style="font-size: 20px" class="success-message text-success bold fw-bolder text-center"></p>
 
+    </div>
 
-
+    <script src="index.js"></script>
     <script src="../../wwwroot/lib/bootstrap/dist/js/bootstrap.min.js"></script>
 </body>
 </html>
