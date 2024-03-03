@@ -59,13 +59,13 @@ async function createUser() {
                 successMsg.innerHTML = ''
                 location.reload()
                 location.href = "Login.html"
-            },3000)
+            },1000)
             
         } else {
             errorMsg.innerHTML = responseData.message
             setTimeout(()=> {
                 errorMsg.innerHTML = ''
-            },2000)
+            },1000)
 
         }
 
@@ -104,18 +104,18 @@ async function Login() {
             setTimeout(()=> {
                 successMsg.innerHTML = ''
                 location.href = "Logout.html"
-            },2000)
+            },1000)
 
    
         } else {
             errorMsg.innerHTML = responseData.message
             setTimeout(()=> {
                 errorMsg.innerHTML = ''
-            },2000)
+            },1000)
         }
 
     } catch (error) {
-        console.error('Fetch error:', error);
+        console.error('Post error:', error);
     }
 }
 
@@ -134,7 +134,7 @@ async function deleteUser() {
             setTimeout(()=> {
                 errorMsg.innerHTML = ''
                 location.href = 'Login.html'
-            },2000)
+            },1000)
         }
 
         const responseData = await response.json();
@@ -150,7 +150,7 @@ async function deleteUser() {
             errorMsg.innerHTML = responseData.message
             setTimeout(()=> {
                 errorMsg.innerHTML = ''
-            },2000)
+            },1000)
         }
 
     } catch (error) {
@@ -158,31 +158,3 @@ async function deleteUser() {
     }
 }
 
-
-
-async function testAuthentication() {
-    const url = baseURL+'/user/test-authentication';
-
-    try {
-        const response = await fetch(url, {
-        method: 'GET',
-        headers: {
-            Authorization: `Bearer ${localStorage.getItem('token')}`
-        },
-    });
-        const responseData = await response.json();
-        if (responseData.success) {
-            successMsg.innerHTML = responseData.message
-            
-        } else {
-            msgContainer.style.display = 'block'
-            errorMsg.innerHTML = responseData.message
-            setTimeout(()=> {
-                errorMsg.innerHTML = ''
-            },2000)
-        }
-
-    } catch (error) {
-        console.error('Fetch error:', error);
-    }
-}
