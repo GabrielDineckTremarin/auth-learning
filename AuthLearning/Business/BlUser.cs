@@ -45,7 +45,53 @@ namespace AuthLearning.Business
 
             }
         }
-        public async Task<string> ValidateUser(NewUser user)
+
+        public async Task<object> DeleteUser(string userId)
+        {
+            try
+            {
+                if (string.IsNullOrEmpty(userId)) throw new Exception("Invalid user Id");
+
+                _userService.DeleteUser(userId);
+                return new { Message = "User deleted", Success = true };
+            }
+            catch (Exception ex)
+            {
+                return new { Message = ex.Message, Success = false };
+
+            }
+        }
+
+        public async Task<object> EditUser(NewUser newUser, string userId)
+        {
+            try
+            {
+
+                var validation = await ValidateUser(newUser, userId);
+                if (!string.IsNullOrEmpty(validation)) throw new Exception(validation);
+
+                string hashedPassword = BCrypt.Net.BCrypt.HashPassword(newUser.Password, BCrypt.Net.BCrypt.GenerateSalt(12));
+
+                var user = new DtoUser()
+                {
+                    Id = userId,
+                    Email = newUser.Email,
+                    Password = hashedPassword,
+                    Username = newUser.Username,
+                };
+                _userService.UpdateUser(user);
+
+
+                return new { Message = "User created", Success = true };
+            }
+            catch (Exception ex)
+            {
+                return new { Message = ex.Message, Success = false };
+
+            }
+        }
+
+        public async Task<string> ValidateUser(NewUser user, string userId = "")
         {
             if (user == null)
                 return "Please, fill out the form correctly";
@@ -59,7 +105,7 @@ namespace AuthLearning.Business
                 return "You need to enter a valid email";
 
             var existingUser = _userService.GetUser(user.Email);
-            if(existingUser != null)
+            if(existingUser != null && existingUser.Id != userId)
                 return "This email is registered already";
 
             if(String.IsNullOrEmpty(user.Username))

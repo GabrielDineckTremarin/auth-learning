@@ -1,3 +1,5 @@
+const baseURL = 'https://localhost:7208'
+
 const msgContainer = document.querySelector(".message-container")
 const errorMsg= document.querySelector(".error-message")
 const successMsg= document.querySelector(".success-message")
@@ -5,12 +7,16 @@ const successMsg= document.querySelector(".success-message")
 function initLoggedUserScreen() {
     const loggedUserMsg = document.querySelector("#logged-user-msg")
     if(loggedUserMsg != null && localStorage.getItem("username")) {
-        var msg = loggedUserMsg.innerHTML
-        msg = msg.replace("XYZ",localStorage.getItem("username"))
+        var msg = 'Hello ' + localStorage.getItem("username")
         loggedUserMsg.innerHTML = msg
     }
   }
   
+function logout() {
+    localStorage.clear()
+    window.location.href= "Login.html"
+}
+
 initLoggedUserScreen();
 
 
@@ -19,7 +25,8 @@ document.getElementById("form")?.addEventListener("submit", function (event) {
     event.preventDefault();
 });
 
-const baseURL = 'https://localhost:7208'
+
+
 
 async function createUser() {
     const url = baseURL+'/user/create-user';
@@ -55,11 +62,10 @@ async function createUser() {
             },3000)
             
         } else {
-            msgContainer.style.display = 'block'
             errorMsg.innerHTML = responseData.message
             setTimeout(()=> {
                 errorMsg.innerHTML = ''
-            },4000)
+            },2000)
 
         }
 
@@ -93,19 +99,19 @@ async function Login() {
         if (responseData.success) {
             successMsg.innerHTML = responseData.message
             localStorage.setItem('token', responseData.token);
+            localStorage.setItem('username',responseData.username)
 
             setTimeout(()=> {
                 successMsg.innerHTML = ''
                 location.href = "Logout.html"
-            },3000)
+            },2000)
 
    
         } else {
-            msgContainer.style.display = 'block'
             errorMsg.innerHTML = responseData.message
             setTimeout(()=> {
                 errorMsg.innerHTML = ''
-            },4000)
+            },2000)
         }
 
     } catch (error) {
@@ -113,96 +119,45 @@ async function Login() {
     }
 }
 
-
-async function Login() {
-    const url = baseURL+'/user/login';
-    const email = document.getElementById('email').value;
-    const password = document.getElementById('password').value;
-
-    const userData = {
-        username: "",
-        email: email,
-        password: password,
-        confirmPassword: ""
-    };
+async function deleteUser() {
+    const url = baseURL+'/user/delete-user';
 
     try {
         const response = await fetch(url, {
-        method: 'POST',
+        method: 'DELETE',
         headers: {
-            'Content-Type': 'application/json'
+            Authorization: `Bearer ${localStorage.getItem('token')}`
         },
-        body: JSON.stringify(userData)
     });
+        if(response.status === 401){
+            errorMsg.innerHTML = "You are not logged in"
+            setTimeout(()=> {
+                errorMsg.innerHTML = ''
+                location.href = 'Login.html'
+            },2000)
+        }
+
         const responseData = await response.json();
         if (responseData.success) {
+            localStorage.clear()
             successMsg.innerHTML = responseData.message
-            localStorage.setItem('token', responseData.token);
-
             setTimeout(()=> {
                 successMsg.innerHTML = ''
-                location.href = "Logout.html"
-            },3000)
-
-   
+                location.href = "Signup.html"
+            },2000)
+            
         } else {
-            msgContainer.style.display = 'block'
             errorMsg.innerHTML = responseData.message
             setTimeout(()=> {
                 errorMsg.innerHTML = ''
-            },4000)
+            },2000)
         }
 
     } catch (error) {
-        console.error('Fetch error:', error);
+        console.error('Delete error:', error);
     }
 }
 
-
-async function Login() {
-    const url = baseURL+'/user/login';
-    const email = document.getElementById('email').value;
-    const password = document.getElementById('password').value;
-    
-
-    const userData = {
-        username: "",
-        email: email,
-        password: password,
-        confirmPassword: ""
-    };
-
-    try {
-        const response = await fetch(url, {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(userData)
-    });
-        const responseData = await response.json();
-        if (responseData.success) {
-            successMsg.innerHTML = responseData.message
-            localStorage.setItem('token', responseData.token);
-            localStorage.setItem('username', responseData.username);
-            // loggedUserMsg.innerText.replace("XYZ", responseData.username)
-            setTimeout(()=> {
-                successMsg.innerHTML = ''
-                location.href = "Logout.html"
-            },3000)
-   
-        } else {
-            msgContainer.style.display = 'block'
-            errorMsg.innerHTML = responseData.message
-            setTimeout(()=> {
-                errorMsg.innerHTML = ''
-            },4000)
-        }
-
-    } catch (error) {
-        console.error('Fetch error:', error);
-    }
-}
 
 
 async function testAuthentication() {
@@ -218,13 +173,13 @@ async function testAuthentication() {
         const responseData = await response.json();
         if (responseData.success) {
             successMsg.innerHTML = responseData.message
-   
+            
         } else {
             msgContainer.style.display = 'block'
             errorMsg.innerHTML = responseData.message
             setTimeout(()=> {
                 errorMsg.innerHTML = ''
-            },4000)
+            },2000)
         }
 
     } catch (error) {

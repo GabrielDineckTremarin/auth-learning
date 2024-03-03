@@ -34,6 +34,23 @@ namespace AuthLearning.Controllers
             return await _blUser.CreateUser(user);
         }
 
+        [HttpPut]
+        [Route("edit-user")]
+        [Authorize]
+        public async Task<object> EditUser([FromBody] NewUser user)
+        {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            return await _blUser.EditUser(user, userId);
+        }
+
+        [HttpDelete]
+        [Route("delete-user")]
+        [Authorize]
+        public async Task<object> DeleteUser()
+        {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            return await _blUser.DeleteUser(userId);
+        }
 
         [HttpPost]
         [Route("login")]
@@ -53,24 +70,7 @@ namespace AuthLearning.Controllers
         }
 
 
-        [HttpGet]
-        [Route("test-authentication")]
-        [Authorize]
-        public async Task<object> TestAuthentication()
-        {
-            try
-            {
-                var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);  // Obtém o ID do usuário autenticado
 
-                var result = await _blUser.TestAuthentication(userId);
-                return result;
-            }
-            catch (Exception ex)
-            {
-                return new { Message = ex.Message, Success = false };
-            }
-
-        }
 
     }
 }
