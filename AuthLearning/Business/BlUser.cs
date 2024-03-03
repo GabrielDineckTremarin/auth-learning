@@ -136,7 +136,7 @@ namespace AuthLearning.Business
                     {
                     new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
                     new Claim(JwtRegisteredClaimNames.Iat, DateTime.UtcNow.ToString()),
-                    new Claim("Id", user.Id),
+                    new Claim(ClaimTypes.NameIdentifier, dbUser.Id)
                     };
 
                     var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["Jwt:Key"]));
@@ -166,13 +166,11 @@ namespace AuthLearning.Business
 
         public async Task<object> TestAuthentication(string userId)
         {
-            var user = _userService.GetUser(userId);
+            var user = _userService.GetUserById(userId);
             
             return new { 
                 Message = user != null ? $"Hello {user.Username}, what's up." : "User not logged in", 
-                Success = true,
-                Data = user
-            
+                Success = user != null,            
             };
         }
     }

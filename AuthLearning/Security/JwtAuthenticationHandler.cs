@@ -10,6 +10,7 @@ using Microsoft.AspNetCore.DataProtection.KeyManagement;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using Microsoft.IdentityModel.Logging;
+using System.Text;
 
 namespace AuthLearning.Security
 {
@@ -35,21 +36,22 @@ namespace AuthLearning.Security
             //    return AuthenticateResult.Fail("Missing Authorization Header");
             //}
             if (Request.Headers.ContainsKey(HeaderNames.Authorization) && Request.Headers[HeaderNames.Authorization].ToString().StartsWith("Bearer"))
-                token = Request.Headers[HeaderNames.Authorization].ToString().Replace("Bearer", string.Empty).Trim();
-
-
+                token = Request.Headers[HeaderNames.Authorization].ToString().Replace("Bearer ", string.Empty);
 
             var validatedToken = ValidateAndDecodeToken(token);
 
-            if (validatedToken == null || String.IsNullOrEmpty(validatedToken.Id))
+            if (validatedToken == null || String.IsNullOrEmpty(validatedToken?.Id))
             {
                 return AuthenticateResult.Fail("Invalid Token");
             }
 
-            var claims = new[] { new Claim(ClaimTypes.Name, validatedToken.Id) };
+            var claims = new[] { 
+                new Claim(ClaimTypes.NameIdentifier, validatedToken.Id) 
+            };
 
             var identity = new ClaimsIdentity(claims, Scheme.Name);
             var principal = new ClaimsPrincipal(identity);
+            
             var ticket = new AuthenticationTicket(principal, Scheme.Name);
 
             return AuthenticateResult.Success(ticket);
@@ -61,17 +63,19 @@ namespace AuthLearning.Security
 
             try
             {
-                var key = _configuration["Jwt:Key"];
-
+                var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["Jwt:Key"]));
                 var validationParameters = new TokenValidationParameters
                 {
+                    ValidateAudience = false,
+                    ValidateIssuer = false,
                     ValidateLifetime = true,
-                    ValidateIssuerSigningKey = true,
-                    IssuerSigningKey = new SymmetricSecurityKey(Convert.FromBase64String(key)),
+                    //ValidateIssuerSigningKey = true,
+                    IssuerSigningKey = key,
           
                 };
                 var principal = tokenHandler.ValidateToken(token, validationParameters, out SecurityToken validatedToken);
                 var userId = principal.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+     
                 return new ValidatedToken() { Id = userId };
             }
             catch (Exception ex) 

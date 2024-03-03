@@ -212,7 +212,7 @@ async function testAuthentication() {
         const response = await fetch(url, {
         method: 'GET',
         headers: {
-            Authorization: `Bearer Authorization ${localStorage.getItem('token')}`
+            Authorization: `Bearer ${localStorage.getItem('token')}`
         },
     });
         const responseData = await response.json();
