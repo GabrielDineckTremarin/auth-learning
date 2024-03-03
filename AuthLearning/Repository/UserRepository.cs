@@ -11,6 +11,7 @@ namespace AuthLearning.Repository
         void UpdateUser(DtoUser user);
         void DeleteUser(string email);
         DtoUser GetUser(string email);
+        DtoUser GetUserById(string id);
 
     }
     public class UserRepository : IUserRepository
@@ -31,6 +32,13 @@ namespace AuthLearning.Repository
         public DtoUser GetUser(string email)
         {
             var filter = Builders<DtoUser>.Filter.Eq("Email", email);
+            var user = _userCollection.Find(filter).FirstOrDefault();
+            return user;
+        }
+
+        public DtoUser GetUserById(string id)
+        {
+            var filter = Builders<DtoUser>.Filter.Eq("_id", new ObjectId(id));
             var user = _userCollection.Find(filter).FirstOrDefault();
             return user;
         }

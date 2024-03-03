@@ -6,6 +6,7 @@ namespace AuthLearning.Service
     public interface IUserService
     {
         DtoUser GetUser(string email);
+        DtoUser GetUserById(string id);
         void CreateUser(DtoUser user);
         void UpdateUser(DtoUser user);
         void DeleteUser(string email);
@@ -22,6 +23,11 @@ namespace AuthLearning.Service
         public DtoUser GetUser(string email)
         {
             return _userRepository.GetUser(email);
+        }
+        
+        public DtoUser GetUserById(string id)
+        {
+            return _userRepository.GetUserById(id);
         }
 
         public void CreateUser(DtoUser user)

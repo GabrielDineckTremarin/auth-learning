@@ -126,32 +126,35 @@ namespace AuthLearning.Business
 
                 var dbUser = _userService.GetUser(user.Email);
 
+                if (dbUser == null) throw new Exception("User not found");
+
                 if (dbUser == null) throw new Exception("There is not any user with this email!");
 
                 if(dbUser.Email == user.Email && BCrypt.Net.BCrypt.Verify(user.Password, dbUser.Password))
                 {
                     var claims = new[]
                     {
-                    //new Claim(JwtRegisteredClaimNames.Sub, _configuration["Jwt:Subject"]),
                     new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
                     new Claim(JwtRegisteredClaimNames.Iat, DateTime.UtcNow.ToString()),
-                    new Claim("Email", user.Email),
+                    new Claim("Id", user.Id),
                     };
 
                     var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["Jwt:Key"]));
                     var signIn = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
                     var token = new JwtSecurityToken(
                         claims: claims,
-                        expires: DateTime.UtcNow.AddMinutes(10),
+                        expires: DateTime.UtcNow.AddMinutes(20),
                         signingCredentials: signIn);
 
                     var tokenString = new JwtSecurityTokenHandler().WriteToken(token);
 
-                    return new { Message = "Authorized", Success = true, Token = tokenString };
+                    return new { Message = "Authorized", Success = true, Token = tokenString, Username = dbUser.Username };
 
                 } 
 
-                return new { Message = "Unauthorized", Success = false };
+
+
+                return new { Message = "Invalid Credentials", Success = false };
             }
             catch (Exception ex)
             {
@@ -161,6 +164,17 @@ namespace AuthLearning.Business
         }
 
 
+        public async Task<object> TestAuthentication(string userId)
+        {
+            var user = _userService.GetUser(userId);
+            
+            return new { 
+                Message = user != null ? $"Hello {user.Username}, what's up." : "User not logged in", 
+                Success = true,
+                Data = user
+            
+            };
+        }
     }
 
 

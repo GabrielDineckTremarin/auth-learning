@@ -2,7 +2,14 @@
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.Extensions.Options;
 using System.Security.Claims;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using System.Text.Encodings.Web;
+using Microsoft.Net.Http.Headers;
+using Microsoft.AspNetCore.DataProtection.KeyManagement;
+using Microsoft.IdentityModel.Tokens;
+using System.IdentityModel.Tokens.Jwt;
+using Microsoft.IdentityModel.Logging;
 
 namespace AuthLearning.Security
 {
@@ -22,21 +29,24 @@ namespace AuthLearning.Security
 
         protected override async Task<AuthenticateResult> HandleAuthenticateAsync()
         {
-            if (!Request.Headers.ContainsKey("Authorization"))
-            {
-                return AuthenticateResult.Fail("Missing Authorization Header");
-            }
+            var token = "";
+            //if (!Request.Headers.ContainsKey("Authorization"))
+            //{
+            //    return AuthenticateResult.Fail("Missing Authorization Header");
+            //}
+            if (Request.Headers.ContainsKey(HeaderNames.Authorization) && Request.Headers[HeaderNames.Authorization].ToString().StartsWith("Bearer"))
+                token = Request.Headers[HeaderNames.Authorization].ToString().Replace("Bearer", string.Empty).Trim();
 
-            var token = Request.Headers["Authorization"].ToString().Replace("Bearer ", "");
+
 
             var validatedToken = ValidateAndDecodeToken(token);
 
-            if (validatedToken == null)
+            if (validatedToken == null || String.IsNullOrEmpty(validatedToken.Id))
             {
                 return AuthenticateResult.Fail("Invalid Token");
             }
 
-            var claims = new[] { new Claim(ClaimTypes.Name, validatedToken.Email) };
+            var claims = new[] { new Claim(ClaimTypes.Name, validatedToken.Id) };
 
             var identity = new ClaimsIdentity(claims, Scheme.Name);
             var principal = new ClaimsPrincipal(identity);
@@ -47,16 +57,33 @@ namespace AuthLearning.Security
 
         private ValidatedToken ValidateAndDecodeToken(string token)
         {
-            var key = configuration["Jwt:Key"];
+            var tokenHandler = new JwtSecurityTokenHandler();
 
-            // vou validar o token aqui usando a chave
-            return new ValidatedToken { Email = "123123213" };
+            try
+            {
+                var key = _configuration["Jwt:Key"];
+
+                var validationParameters = new TokenValidationParameters
+                {
+                    ValidateLifetime = true,
+                    ValidateIssuerSigningKey = true,
+                    IssuerSigningKey = new SymmetricSecurityKey(Convert.FromBase64String(key)),
+          
+                };
+                var principal = tokenHandler.ValidateToken(token, validationParameters, out SecurityToken validatedToken);
+                var userId = principal.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+                return new ValidatedToken() { Id = userId };
+            }
+            catch (Exception ex) 
+            {
+                return null;
+            }
         }
     }
 
     public class ValidatedToken
     {
-        public string Email { get; set; }
+        public string Id { get; set; }
         // objeto retornado par ao token valido/invalido
     }
 }

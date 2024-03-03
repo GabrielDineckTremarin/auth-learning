@@ -11,6 +11,7 @@ using System.Text;
 namespace AuthLearning.Controllers
 {
     [Authorize(AuthenticationSchemes = "Bearer")]
+    //[Authorize(AuthenticationSchemes = APIUserTokenScheme.Tracker)]
     [ApiController]
     [Route("[controller]")]
     public class UserController : ControllerBase
@@ -35,7 +36,7 @@ namespace AuthLearning.Controllers
 
 
         [HttpPost]
-        [Route("check-login")]
+        [Route("login")]
         [AllowAnonymous]
         public async Task<object> CheckLogin([FromBody]DtoUser user)
         {
@@ -49,8 +50,26 @@ namespace AuthLearning.Controllers
                 return new { Message = ex.Message, Success = false };
             }
 
+        }
 
-            return new { Message = "Unauthorized", Success = false };
+
+        [HttpGet]
+        [Route("test-authentication")]
+        [Authorize]
+        public async Task<object> TestAuthentication()
+        {
+            try
+            {
+                var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);  // Obtém o ID do usuário autenticado
+
+                var result = await _blUser.TestAuthentication(userId);
+                return result;
+            }
+            catch (Exception ex)
+            {
+                return new { Message = ex.Message, Success = false };
+            }
+
         }
 
     }
