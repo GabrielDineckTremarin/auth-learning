@@ -62,36 +62,8 @@ namespace AuthLearning.Business
             }
         }
 
-        public async Task<object> EditUser(NewUser newUser, string userId)
-        {
-            try
-            {
 
-                var validation = await ValidateUser(newUser, userId);
-                if (!string.IsNullOrEmpty(validation)) throw new Exception(validation);
-
-                string hashedPassword = BCrypt.Net.BCrypt.HashPassword(newUser.Password, BCrypt.Net.BCrypt.GenerateSalt(12));
-
-                var user = new DtoUser()
-                {
-                    Id = userId,
-                    Email = newUser.Email,
-                    Password = hashedPassword,
-                    Username = newUser.Username,
-                };
-                _userService.UpdateUser(user);
-
-
-                return new { Message = "User created", Success = true };
-            }
-            catch (Exception ex)
-            {
-                return new { Message = ex.Message, Success = false };
-
-            }
-        }
-
-        public async Task<string> ValidateUser(NewUser user, string userId = "")
+        public async Task<string> ValidateUser(NewUser user)
         {
             if (user == null)
                 return "Please, fill out the form correctly";
@@ -105,7 +77,7 @@ namespace AuthLearning.Business
                 return "You need to enter a valid email";
 
             var existingUser = _userService.GetUser(user.Email);
-            if(existingUser != null && existingUser.Id != userId)
+            if(existingUser != null)
                 return "This email is registered already";
 
             if(String.IsNullOrEmpty(user.Username))

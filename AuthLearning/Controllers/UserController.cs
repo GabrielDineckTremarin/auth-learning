@@ -34,14 +34,7 @@ namespace AuthLearning.Controllers
             return await _blUser.CreateUser(user);
         }
 
-        [HttpPut]
-        [Route("edit-user")]
-        [Authorize]
-        public async Task<object> EditUser([FromBody] NewUser user)
-        {
-            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            return await _blUser.EditUser(user, userId);
-        }
+
 
         [HttpDelete]
         [Route("delete-user")]
